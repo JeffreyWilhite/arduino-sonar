@@ -17,8 +17,9 @@
 
 const int BEEP_DELAY_PER_INCH = 5;            // milliseconds of beep delay per inch of distance
 const int MAX_DURATION = 30000;               // longest useful echo duration in microseconds (about 200 inches)
-const int SONAR_MICROSECONDS_PER_INCH = 148;  // half the speed of sound (there and back)
+const int SONAR_MICROSECONDS_PER_INCH = 296;  // the speed of sound
 const int BEEP_LENGTH = 20;                   // length of the beep tone (in milliseconds)
+const int TRIG_PIN_DELAY = 50;                // number of microseconds to hold the trigger pin HIGH
 
 // The setup function is automatically run once when the program is started
 void setup() 
@@ -30,7 +31,7 @@ void setup()
 // This only gets called if we are debugging
 #ifdef DEBUG
     Serial.begin(9600);  // Communicate with the computer over a 9600 baud serial port
-    Serial.print("Sonar started");
+    Serial.print("Sonar started\r\n");
 #endif
 }
 
@@ -51,7 +52,9 @@ void loop()
     if (echoDuration > 0) 
     {
         // Uses the speed of sound to convert the echoDuration to inches
-        int inches = echoDuration / SONAR_MICROSECONDS_PER_INCH;
+        int inchesSoundTravels = echoDuration / SONAR_MICROSECONDS_PER_INCH;
+        // Divide by 2 because the sound travels to the target and back again
+        int inchesToTarget = inchesSoundTravels / 2  
         // Decides how long to delay the beeps based on how far away the sonar is detecting an object
         int beepDelay = BEEP_DELAY_PER_INCH * inches;
         printDebug(echoDuration, inches, beepDelay);
@@ -64,16 +67,16 @@ void loop()
 
 void triggerSonar()
 {
-    digitalWrite(TRIG_PIN, HIGH); // Trigger the sonar to start sending a ping
-    delayMicroseconds(10);        // Wait 10 microseconds
-    digitalWrite(TRIG_PIN, LOW);  // Stop sending the sonar ping  
+    digitalWrite(TRIG_PIN, HIGH);       // Trigger the sonar to start sending a ping
+    delayMicroseconds(TRIG_PIN_DELAY);  // Keep the pin HIGH for TRIG_PIN_DELAY microseconds before setting it low again
+    digitalWrite(TRIG_PIN, LOW);        // Stop sending the sonar ping  
 }
 
 void playBeep()
 {
-    digitalWrite(BEEP_PIN, HIGH);
-    delay(BEEP_LENGTH);
-    digitalWrite(BEEP_PIN, LOW);
+    digitalWrite(BEEP_PIN, HIGH);       // Begin playing a beep on the beeper
+    delay(BEEP_LENGTH);                 // Wait BEEP_LENGTH milliseconds before stopping the beep    
+    digitalWrite(BEEP_PIN, LOW);        // Stop playing the beep
 }
 
 void printDebug(int echoDuration, int inches, int beepDelay)
