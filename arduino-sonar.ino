@@ -17,7 +17,7 @@
 
 const int BEEP_DELAY_PER_INCH = 5;            // milliseconds of beep delay per inch of distance
 const int MAX_DURATION = 30000;               // longest useful echo duration in microseconds (about 200 inches)
-const int SONAR_MICROSECONDS_PER_INCH = 296;  // the speed of sound
+const int SONAR_MICROSECONDS_PER_INCH = 74;   // the speed of sound in microseconds per inch (767 mph)
 const int BEEP_LENGTH = 20;                   // length of the beep tone (in milliseconds)
 const int TRIG_PIN_DELAY = 50;                // number of microseconds to hold the trigger pin HIGH
 
@@ -54,10 +54,10 @@ void loop()
         // Uses the speed of sound to convert the echoDuration to inches
         int inchesSoundTravels = echoDuration / SONAR_MICROSECONDS_PER_INCH;
         // Divide by 2 because the sound travels to the target and back again
-        int inchesToTarget = inchesSoundTravels / 2  
+        int inchesToTarget = inchesSoundTravels / 2;  
         // Decides how long to delay the beeps based on how far away the sonar is detecting an object
-        int beepDelay = BEEP_DELAY_PER_INCH * inches;
-        printDebug(echoDuration, inches, beepDelay);
+        int beepDelay = BEEP_DELAY_PER_INCH * inchesToTarget;
+        printDebug(echoDuration, inchesToTarget, beepDelay);
 
         playBeep();
         // Wait a total of beepDelay milliseconds between beeps       
